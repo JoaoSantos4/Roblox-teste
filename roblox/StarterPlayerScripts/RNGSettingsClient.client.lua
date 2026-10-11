@@ -216,15 +216,13 @@ end)
 for _, other in ipairs(Players:GetPlayers()) do
 	watchPlayer(other)
 end
-local originalGuiEnabled = setmetatable({}, { __mode = "k" })
 local function applyGui(object)
 	if object == gui or not object:IsA("ScreenGui") or object.Name:sub(1, 3) ~= "RNG" then
 		return
 	end
-	if originalGuiEnabled[object] == nil then
-		originalGuiEnabled[object] = object.Enabled
-	end
-	object.Enabled = enabled.Interface and originalGuiEnabled[object] or false
+	-- O botão controla todas as interfaces RNG, inclusive as criadas enquanto ocultas.
+	-- Não memorize Enabled=false: esse valor pode ter sido imposto por esta opção.
+	object.Enabled = enabled.Interface
 end
 playerGui.ChildAdded:Connect(applyGui)
 local function refreshGui()

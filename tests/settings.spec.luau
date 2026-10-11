@@ -92,8 +92,19 @@ toggle("Mostrar interface do jogo",true)
 check(not rollGui.Enabled and named("RNGSettingsGui").Enabled and nonGameGui.Enabled)
 local lateGui = new("ScreenGui",playerGui); lateGui.Name = "RNGStatusGui"; playerGui.ChildAdded.fn(lateGui)
 check(not lateGui.Enabled)
+local initiallyDisabled = new("ScreenGui",playerGui)
+initiallyDisabled.Name = "RNGInventoryGui"
+initiallyDisabled.Enabled = false
+playerGui.ChildAdded.fn(initiallyDisabled)
 toggle("Mostrar interface do jogo",false)
-check(rollGui.Enabled and lateGui.Enabled)
+check(rollGui.Enabled and lateGui.Enabled and initiallyDisabled.Enabled)
+for _ = 1,3 do
+ toggle("Mostrar interface do jogo",true)
+ check(not rollGui.Enabled and not lateGui.Enabled and not initiallyDisabled.Enabled)
+ toggle("Mostrar interface do jogo",false)
+ check(rollGui.Enabled and lateGui.Enabled and initiallyDisabled.Enabled)
+end
+check(named("RNGSettingsGui").Enabled and nonGameGui.Enabled)
 toggle("Áudio do Roblox (passos e efeitos)",true)
 check(running.SoundGroup.Volume == 0)
 toggle("Áudio do Roblox (passos e efeitos)",false)
