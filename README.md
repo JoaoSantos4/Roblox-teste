@@ -76,7 +76,7 @@ npm install --prefix /tmp/rng-luau-check --cache /tmp/rng-npm-cache --ignore-scr
 node tests/check.mjs /tmp/rng-luau-check/node_modules/luau-web/src/index.js
 ```
 
-Os quinze scripts compilam em Luau. Testes com serviços simulados: 22 do perfil, 34 do servidor, 19 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, 13 de status, 25 das opções, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
+Os quinze scripts compilam em Luau. Testes com serviços simulados: 22 do perfil, 34 do servidor, 19 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, 13 de status, 36 das opções, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
 
 ## Coleção de auras
 
@@ -125,3 +125,7 @@ O switch de áudio Roblox controla os sons padrão dos personagens visíveis (pa
 Teste no Studio e no cliente Roblox: posição da engrenagem com/sem voz, mouse/toque, ocultar interface e reabrir opções, esconder/restaurar sua aura e a dos outros, respawn, troca de aura, tirar aura, desligar cada categoria de áudio e religa-la. Qualidade musical, posicionamento real e multiplayer exigem testes no Roblox. Compilação e testes de opções, restauração e áudio foram executados com serviços simulados.
 
 A opção Mostrar interface do jogo liga ou desliga todas as ScreenGuis RNG, exceto RNGSettingsGui. Ao religar, também restaura interfaces que estavam desativadas ou foram criadas durante a ocultação.
+
+## Tema de praia e músicas por aura
+
+A versão atual de RNGSettingsClient tem novas melodias próprias e suporta oito MP3s completos na pasta [music](music/README.md). Ambiente tropical com chocalho/ondas sintetizadas e sete temas com ritmos e timbres distintos. Substitua apenas RNGSettingsClient para usar as melodias simples imediatamente. Para ouvir os MP3s com acompanhamento e timbres completos, importe os arquivos no Roblox e preencha o AssetId de cada entrada da tabela music; veja [as instruções de áudio](music/README.md). A troca de música acompanha a aura equipada. A correção de restauração da interface permanece incluída.

@@ -123,4 +123,23 @@ toggle("Música da aura equipada",true)
 check(not named("RNGAuraNote1").IsPlaying and named("RNGAuraMusic").Volume == 0)
 inventory.OnClientEvent.fn({ Equipped = nil })
 check(not named("RNGAuraNote1").IsPlaying)
+local signatures = {}
+local tracks = 0
+for _,track in pairs(music) do
+ local parts = {}
+ for _,note in ipairs(track.Notes) do table.insert(parts,tostring(note)) end
+ local signature = table.concat(parts,",")
+ check(not signatures[signature])
+ signatures[signature] = true
+ tracks += 1
+end
+check(tracks == 8)
+music.ambient.AssetId = "rbxassetid://123456"
+toggle("Música ambiente do jogo",false)
+assert(coroutine.resume(ambient))
+local fullTrack = named("RNGEnvironmentNote1")
+check(fullTrack.SoundId == "rbxassetid://123456" and fullTrack.Looped and fullTrack.PlaybackSpeed == 1)
+local plays = fullTrack.plays
+assert(coroutine.resume(ambient))
+check(fullTrack.plays == plays) -- não reinicia o MP3 a cada nota
 print("Settings: " .. count .. " verificações passaram (interface e áudio simulados)")

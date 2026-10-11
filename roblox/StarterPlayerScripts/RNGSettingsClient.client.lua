@@ -232,35 +232,73 @@ local function refreshGui()
 end
 -- Melodias próprias tocadas com o som incluído no Roblox. Não exigem asset de áudio externo.
 -- Para trocar por faixas autorizadas, preencha AssetId = "rbxassetid://ID" na entrada correspondente.
+-- MP3s completos estão na pasta music do GitHub. Importe-os e preencha os AssetIds.
+-- Com AssetId vazio, toca uma versão simples da melodia com sons incluídos no Roblox.
 local music = {
+	-- Praia_Ambiente.mp3
 	ambient = {
-		Beat = 0.9,
-		Notes = { -12, -5, 0, 4, 7, 4, 0, -5 },
+		Beat = 0.30000,
+		Notes = { 0, 4, 7, 9, 7, 4, 2, 4, 7, 12, 9, 7, 4, 2, 0, false },
 		Volume = 0.055,
+		AssetVolume = 0.3,
 		AssetId = "",
 	},
+	-- Comum_Conforto.mp3
 	common = {
-		Beat = 0.7,
-		Notes = { 0, 4, 7, 4, 0, false, 4, false },
-		Volume = 0.06,
+		Beat = 0.26786,
+		Notes = { 0, 4, 7, false, 4, 2, 0, false, 7, 4, 2, 4, 0, false, 2, false },
+		Volume = 0.055,
+		AssetVolume = 0.3,
 		AssetId = "",
 	},
+	-- Incomum_Natureza.mp3
 	uncommon = {
-		Beat = 0.65,
-		Notes = { 0, 2, 7, 9, 7, 2, 0, false },
-		Volume = 0.06,
+		Beat = 0.34884,
+		Notes = { 0, 2, 7, 9, 7, false, 2, 0, 5, 9, 12, 9, 7, 5, 2, false },
+		Volume = 0.055,
+		AssetVolume = 0.3,
 		AssetId = "",
 	},
-	rare = { Beat = 0.55, Notes = { 0, 7, 12, 14, 12, 7, 5, 7 }, Volume = 0.065, AssetId = "" },
-	epic = { Beat = 0.7, Notes = { -12, 0, 3, 7, 10, 7, 3, 0 }, Volume = 0.065, AssetId = "" },
+	-- Raro_Oceano.mp3
+	rare = {
+		Beat = 0.32609,
+		Notes = { 0, 7, 12, false, 14, 12, 7, 5, 9, 12, 16, 14, 12, 9, 7, false },
+		Volume = 0.055,
+		AssetVolume = 0.3,
+		AssetId = "",
+	},
+	-- Epico_Sombras.mp3
+	epic = {
+		Beat = 0.33333,
+		Notes = { 0, 3, 7, 10, 7, false, 3, 0, 5, 8, 12, 8, 7, 3, 0, false },
+		Volume = 0.055,
+		AssetVolume = 0.3,
+		AssetId = "",
+	},
+	-- Lendario_Solar.mp3
 	legendary = {
-		Beat = 0.5,
-		Notes = { 0, 4, 7, 12, 7, 12, 16, 12 },
-		Volume = 0.07,
+		Beat = 0.25424,
+		Notes = { 0, 4, 7, 12, 7, 12, 16, false, 14, 12, 7, 4, 9, 7, 4, 0 },
+		Volume = 0.055,
+		AssetVolume = 0.3,
 		AssetId = "",
 	},
-	divine = { Beat = 0.8, Notes = { 0, 7, 12, 16, 19, 16, 12, 7 }, Volume = 0.07, AssetId = "" },
-	secret = { Beat = 0.6, Notes = { -12, 0, 1, 7, 8, 7, 1, 0 }, Volume = 0.07, AssetId = "" },
+	-- Divino_Cosmos.mp3
+	divine = {
+		Beat = 0.40541,
+		Notes = { 0, 7, 12, 16, 19, false, 16, 12, 5, 12, 17, 21, 19, 17, 12, false },
+		Volume = 0.055,
+		AssetVolume = 0.3,
+		AssetId = "",
+	},
+	-- Segredo_Enigma.mp3
+	secret = {
+		Beat = 0.38462,
+		Notes = { 0, 1, 7, false, 8, 7, 1, 0, 3, 7, 10, 8, 7, 3, 1, false },
+		Volume = 0.055,
+		AssetVolume = 0.3,
+		AssetId = "",
+	},
 }
 local function voices(name, soundGroup)
 	local result = {}
@@ -289,7 +327,7 @@ local function play(pool, track, index)
 			sound:Stop()
 			sound.SoundId = track.AssetId
 		end
-		sound.Volume = track.Volume
+		sound.Volume = track.AssetVolume or track.Volume
 		sound.PlaybackSpeed = 1
 		sound.Looped = true
 		if not sound.IsPlaying then
