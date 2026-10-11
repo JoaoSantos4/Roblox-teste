@@ -25,6 +25,7 @@ Crie este módulo antes de testar os LocalScripts atualizados.
 | RNGDaily | ModuleScript | [RNGDaily.lua](roblox/ServerScriptService/RNGDaily.lua) |
 | RNGQuests | ModuleScript | [RNGQuests.lua](roblox/ServerScriptService/RNGQuests.lua) |
 | RNGServer | Script | [RNGServer.server.lua](roblox/ServerScriptService/RNGServer.server.lua) |
+| RNGMap | Script | [RNGMap.server.lua](roblox/ServerScriptService/RNGMap.server.lua) |
 
 ### StarterPlayer → StarterPlayerScripts
 
@@ -84,7 +85,7 @@ npm install --prefix /tmp/rng-luau-check --cache /tmp/rng-npm-cache --ignore-scr
 node tests/check.mjs /tmp/rng-luau-check/node_modules/luau-web/src/index.js
 ```
 
-Os dezesseis scripts compilam em Luau. Testes com serviços simulados: 22 do perfil, 34 do servidor, 19 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, 13 de status, 36 das opções, 20 da UIConfig, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
+Os dezessete scripts compilam em Luau. Testes com serviços simulados: 22 do perfil, 34 do servidor, 19 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, 13 de status, 36 das opções, 20 da UIConfig, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
 
 ## Coleção de auras
 
@@ -153,3 +154,19 @@ Os painéis respeitam o espaço disponível com margem e limite de tamanho. Font
 Ocultar interface nas opções também oculta MENU; a engrenagem permanece. Auto Roll continua se já estiver ligado. Os menus não alteram equipamento, sorte, poções, moedas, ranking nem DataStores.
 
 Teste no Emulador de Dispositivos do Studio: celular retrato/paisagem, tablet, janela pequena e computador. Verifique MENU, fechar painel, abrir apenas um menu por vez, rolagem, botões de resgate/compra, movimento/pulo e desligar/religar interface. Os 20 testes simulados verificam dimensões, safe area, reparent dos atalhos, restauração no desktop, ajuste de texto e painel exclusivo. Eles não substituem a verificação visual e de toque no Roblox.
+
+## Mapa tropical e ambientação
+
+Pare o teste. Em ServerScriptService, crie um Script (não ModuleScript) chamado RNGMap e cole RNGMap.server.lua inteiro. Aperte Play: o cenário é construído pelo servidor em Workspace/RNGTropicalMap e compartilhado com todos os jogadores. Não é necessário substituir RNGServer, módulos de perfil, UI ou áudio. O mapa aparece durante Play; após Stop, o cenário gerado não fica salvo como construção editável no projeto.
+
+Áreas: Lobby Tropical com praça, caminhos, píer, bancos, guarda-sóis e coqueiros; Bosque Natural; Mirante Solar com escadaria e arco; Templo Astral com colunas e cristal luminoso. Três pontes ligam as ilhas. Placas orientam a exploração. As áreas são decorativas e ainda não concedem recompensas ou progresso de missão por visita.
+
+O mapa utiliza partes ancoradas, materiais incluídos no Roblox, sol de fim de tarde, Atmosphere e Bloom suave. O cenário padrão Baseplate é ocultado e fica sem colisão durante Play; o SpawnLocation padrão é desativado e o novo RNGSpawn se torna o ponto de retorno. Outros modelos do projeto não são apagados. O script altera Lighting durante a execução, incluindo Atmosphere existente quando houver. Stop desfaz essas mudanças de execução. Não combine com outro gerador ou sistema de Lighting sem revisar o efeito conjunto.
+
+O oceano é uma superfície decorativa, não Terrain Water para nadar. Ao tocar a água, o jogador retorna ao lobby, sem morte, perda de moedas ou mudança de aura. Há limitação de frequência no retorno. Um cenário já existente com o nome RNGTropicalMap faz o script parar, para evitar duplicação; instale apenas uma cópia de RNGMap.
+
+A trilha de praia já está em RNGSettingsClient. RNGMap não cria um segundo som, preservando as opções de música e as músicas das auras. As versões completas em MP3 continuam exigindo importação e IDs autorizados, conforme music/README.md.
+
+A tabela Settings no início permite ajustar hora, tamanho do oceano, quantidade de coqueiros, semente e retorno da água. Não altere MapName enquanto houver cópias geradas do cenário em execução.
+
+Teste no Studio: spawn, todas as pontes, escadaria do mirante, colisões, volta após cair na água, respawn, visibilidade da aura na nova iluminação e desempenho no celular. O script compila em Luau; testes simulados verificaram 370 peças ancoradas, três pontes, 25 coqueiros, spawn, retorno com limitação, preservação de modelos externos e construção única. Colisões reais, aparência e desempenho exigem Roblox Studio.
