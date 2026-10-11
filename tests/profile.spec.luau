@@ -31,4 +31,11 @@ check(not pcall(Profile.Decode, { Version = 2, BestOdds = 0, Owned = {}, Equippe
 check(not pcall(Profile.Decode, { Version = 2, BestOdds = 0, Owned = { rare = 3 }, EquipTime = 0 }))
 local union = Profile.Merge(stored, stale)
 check(union.Owned.legendary and union.Owned.rare and union.Owned.common)
+check(empty.TotalRolls == 0 and legacy.TotalRolls == 0)
+local rolled = Profile.Decode(stored)
+rolled.TotalRolls = 1234
+check(Profile.Merge(rolled, stored).TotalRolls == 1234)
+check(Profile.Merge(stored, rolled).TotalRolls == 1234)
+check(Profile.Merge(rolled, rolled).TotalRolls == 1234)
+check(not pcall(Profile.Decode, { Version = 1, BestOdds = 0, TotalRolls = -1 }))
 print("Profile: " .. count .. " verificações passaram")

@@ -13,6 +13,7 @@ Pare o teste antes de editar. Abra cada arquivo pelo link abaixo e clique em **R
 | RNGConfig | ModuleScript | [RNGConfig.lua](roblox/ServerScriptService/RNGConfig.lua) |
 | RNGProfile | ModuleScript | [RNGProfile.lua](roblox/ServerScriptService/RNGProfile.lua) |
 | RNGAuraEffect | ModuleScript | [RNGAuraEffect.lua](roblox/ServerScriptService/RNGAuraEffect.lua) |
+| RNGRankings | ModuleScript | [RNGRankings.lua](roblox/ServerScriptService/RNGRankings.lua) |
 | RNGDaily | ModuleScript | [RNGDaily.lua](roblox/ServerScriptService/RNGDaily.lua) |
 | RNGQuests | ModuleScript | [RNGQuests.lua](roblox/ServerScriptService/RNGQuests.lua) |
 | RNGServer | Script | [RNGServer.server.lua](roblox/ServerScriptService/RNGServer.server.lua) |
@@ -26,6 +27,7 @@ Pare o teste antes de editar. Abra cada arquivo pelo link abaixo e clique em **R
 | RNGQuestClient | LocalScript | [RNGQuestClient.client.lua](roblox/StarterPlayerScripts/RNGQuestClient.client.lua) |
 | RNGShopClient | LocalScript | [RNGShopClient.client.lua](roblox/StarterPlayerScripts/RNGShopClient.client.lua) |
 | RNGCollection | LocalScript | [RNGCollection.client.lua](roblox/StarterPlayerScripts/RNGCollection.client.lua) |
+| RNGRankingClient | LocalScript | [RNGRankingClient.client.lua](roblox/StarterPlayerScripts/RNGRankingClient.client.lua) |
 
 A interface e os RemoteEvents são criados automaticamente. RNGAuraEffect é singular. Para atualizar a loja na instalação existente, substitua RNGDaily, RNGQuests e RNGServer juntos e adicione RNGShopClient.
 
@@ -72,7 +74,7 @@ npm install --prefix /tmp/rng-luau-check --cache /tmp/rng-npm-cache --ignore-scr
 node tests/check.mjs /tmp/rng-luau-check/node_modules/luau-web/src/index.js
 ```
 
-Os onze scripts compilam em Luau. Testes com serviços simulados: 13 do perfil, 28 do servidor, 17 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
+Os treze scripts compilam em Luau. Testes com serviços simulados: 18 do perfil, 29 do servidor, 17 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
 
 ## Coleção de auras
 
@@ -83,3 +85,15 @@ COLEÇÃO aparece à esquerda, abaixo de INVENTÁRIO. Mostra as descobertas, cha
 A nova aura secret (Segredo) tem chance base de 1 em 1.000.000, cor rosa/vermelha e anúncio no chat. Aparece como ??? até ser obtida, com a chance visível. Secret é uma ocultação visual do nome no catálogo; não oculta o código da raridade de clientes modificados. Se obtida, entra no inventário normalmente e usa os efeitos genéricos existentes na sua cor. Nenhuma aura é concedida automaticamente por esta atualização.
 
 Teste coleção antes e depois de uma descoberta, troca de equipamento, respawn e nova entrada. Confira os botões no celular. A compilação e 12 verificações da coleção passaram com interface simulada; a renderização exige Studio.
+
+## Ranking global
+
+Pare o teste. Substitua RNGProfile e RNGServer inteiros. Crie um ModuleScript RNGRankings em ServerScriptService e um LocalScript RNGRankingClient em StarterPlayer → StarterPlayerScripts, copiando os respectivos arquivos completos. Crie RNGRankings antes de iniciar o servidor atualizado; não remova os outros módulos.
+
+RANKING aparece à esquerda abaixo de COLEÇÃO. Há duas abas, cada uma com Top 20: maiores denominadores de raridade e total permanente de rolls aceitos. Os três primeiros têm destaque dourado e sua linha fica verde se estiver no Top 20. Em empates de score, a ordem é definida pelo OrderedDataStore.
+
+TotalRolls é salvo junto do perfil RNG_Best_v1 e começa em zero para perfis antigos: os antigos contadores de missões eram limitados e reiniciavam, portanto não recuperam todo o histórico de rolls. Recordes antigos são preservados e entram no ranking quando os jogadores voltam, salvam e o espelho atualiza. Não há varredura de todos os perfis antigos. Como os demais contadores, a fusão por máximo evita repetição de saves; duas sessões simultâneas da mesma conta podem subcontar rolagens.
+
+Os OrderedDataStores RNG_GlobalBest_v1 e RNG_GlobalRolls_v1 recebem somente valores de perfis confirmados no DataStore normal. A fila de publicação e a leitura do Top 20 rodam a cada 60 segundos, em cada servidor. Dados costumam aparecer em 1–2 minutos; limites, falhas e consistência eventual podem aumentar esse atraso. Pedidos dos clientes só leem um cache e nunca informam scores nem disparam consultas ao DataStore. Falhas de gravação mantêm a fila para tentar novamente; se o servidor fechar, o perfil salvo republica ao voltar.
+
+Teste em uma experiência publicada com acesso à API: faça rolls, aguarde as atualizações e veja as duas abas. Saia e entre para conferir que o total permanece. Os rankings são da mesma experiência Roblox em todos os seus servidores; uma experiência de teste separada tem outros DataStores. Falhas de leitura preservam o último ranking válido e são registradas na Saída. A verificação real entre servidores ainda exige Roblox Studio/Roblox.

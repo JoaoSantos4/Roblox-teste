@@ -9,6 +9,8 @@ local Profile = require(script.Parent:WaitForChild("RNGProfile"))
 local AuraEffects = require(script.Parent:WaitForChild("RNGAuraEffect"))
 local Quests = require(script.Parent:WaitForChild("RNGQuests"))
 Quests.Start()
+local Rankings = require(script.Parent:WaitForChild("RNGRankings"))
+Rankings.Start()
 
 -- Mantém o DataStore antigo para recuperar seu recorde.
 local Store = DataStoreService:GetDataStore("RNG_Best_v1")
@@ -214,6 +216,7 @@ local function save(player, state)
 	if ok then
 		-- Preserva alterações feitas durante o salvamento.
 		state.data = Profile.Merge(state.data, saved)
+		Rankings.Publish(player.UserId, saved.BestOdds, saved.TotalRolls)
 
 		if state.revision == revision then
 			state.dirty = false
@@ -362,6 +365,8 @@ rollEvent.OnServerEvent:Connect(function(player, fast, requestId)
 
 	-- Um único sorteio: missões e inventário recebem o mesmo resultado.
 	local item = draw(luck)
+	state.data.TotalRolls += 1
+	changed(state)
 	Quests.RecordRoll(player, item)
 
 	if item then

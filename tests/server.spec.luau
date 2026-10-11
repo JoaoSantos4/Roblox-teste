@@ -46,6 +46,7 @@ local game = { GetService = function(_, name) return services[name] end, BindToC
 local script = { Parent = { WaitForChild = function(_, name) return name end } }
 local questRolls, questEquips, lastQuestAura = 0, 0, nil
 local require = function(name)
+    if name == "RNGRankings" then return { Start = function() end, Publish = function() end } end
     if name == "RNGConfig" then return Config end
     if name == "RNGAuraEffect" then return { Apply = function() end } end
     if name == "RNGQuests" then return {
@@ -121,6 +122,7 @@ check(inventory.last.Equipped == nil)
 Players.PlayerRemoving.fn(p)
 check(saved.Version == 2 and saved.Owned.common and saved.Owned.rare)
 check(saved.BestOdds == 50 and saved.Equipped == nil and saved.EquipTime > 0)
+check(saved.TotalRolls == 3) -- pedidos falsos e cooldown não contam
 local previousWrites = writes
 failLoad = true
 local broken = player(2)
@@ -132,4 +134,3 @@ Players.PlayerRemoving.fn(broken)
 check(writes == previousWrites)
 check(inventory.last.Catalog[3].Secret == true and inventory.last.Owned.secret == nil)
 print("Server: " .. count .. " verificações passaram (serviços simulados)")
-
