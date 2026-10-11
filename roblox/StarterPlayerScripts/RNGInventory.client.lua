@@ -108,3 +108,7 @@ local function ready()
 end
 player:GetAttributeChangedSignal("RNGReady"):Connect(ready)
 ready()
+
+-- Regras compartilhadas para computador e celular.
+local UIConfig = require(ReplicatedStorage:WaitForChild("RNGUIConfig"))
+UIConfig.RegisterPanel("inventory", gui, panel, toggle, close, 480, 500, 1)

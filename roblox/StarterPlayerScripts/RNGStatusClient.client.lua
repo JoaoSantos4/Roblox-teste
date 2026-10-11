@@ -181,3 +181,7 @@ task.spawn(function()
 		task.wait(1)
 	end
 end)
+
+-- Regras compartilhadas para computador e celular.
+local UIConfig = require(ReplicatedStorage:WaitForChild("RNGUIConfig"))
+UIConfig.RegisterPanel("status", gui, panel, toggle, close, 520, 540, 6)

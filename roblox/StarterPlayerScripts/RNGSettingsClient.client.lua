@@ -445,3 +445,7 @@ task.spawn(function()
 	player:GetAttributeChangedSignal("RNGReady"):Connect(sync)
 	sync()
 end)
+
+-- Regras compartilhadas para computador e celular.
+local UIConfig = require(ReplicatedStorage:WaitForChild("RNGUIConfig"))
+UIConfig.RegisterPanel("settings", gui, panel, nil, close, 560, 540, 7)

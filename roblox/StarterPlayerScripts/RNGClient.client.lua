@@ -233,3 +233,6 @@ announcement.OnClientEvent:Connect(function(message)
     local general = channels and channels:WaitForChild("RBXGeneral", 10)
     if general then general:DisplaySystemMessage(message) end
 end)
+
+local UIConfig = require(ReplicatedStorage:WaitForChild("RNGUIConfig"))
+UIConfig.RegisterRoll(gui, controls, card)

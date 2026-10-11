@@ -6,6 +6,14 @@ Scripts completos de RNG, inventário, auras, Auto Roll, rolagem rápida, missõ
 
 Pare o teste antes de editar. Abra cada arquivo pelo link abaixo e clique em **Raw** para copiar o código completo. No editor do Studio, use **Ctrl+A** e cole. Os nomes dos objetos não incluem a extensão do arquivo. Instale uma única cópia de cada script.
 
+### ReplicatedStorage
+
+| Nome no Studio | Tipo | Código completo |
+|---|---|---|
+| RNGUIConfig | ModuleScript | [RNGUIConfig.lua](roblox/ReplicatedStorage/RNGUIConfig.lua) |
+
+Crie este módulo antes de testar os LocalScripts atualizados.
+
 ### ServerScriptService
 
 | Nome no Studio | Tipo | Código completo |
@@ -76,7 +84,7 @@ npm install --prefix /tmp/rng-luau-check --cache /tmp/rng-npm-cache --ignore-scr
 node tests/check.mjs /tmp/rng-luau-check/node_modules/luau-web/src/index.js
 ```
 
-Os quinze scripts compilam em Luau. Testes com serviços simulados: 22 do perfil, 34 do servidor, 19 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, 13 de status, 36 das opções, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
+Os dezesseis scripts compilam em Luau. Testes com serviços simulados: 22 do perfil, 34 do servidor, 19 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, 13 de status, 36 das opções, 20 da UIConfig, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
 
 ## Coleção de auras
 
@@ -129,3 +137,19 @@ A opção Mostrar interface do jogo liga ou desliga todas as ScreenGuis RNG, exc
 ## Tema de praia e músicas por aura
 
 A versão atual de RNGSettingsClient tem novas melodias próprias e suporta oito MP3s completos na pasta [music](music/README.md). Ambiente tropical com chocalho/ondas sintetizadas e sete temas com ritmos e timbres distintos. Substitua apenas RNGSettingsClient para usar as melodias simples imediatamente. Para ouvir os MP3s com acompanhamento e timbres completos, importe os arquivos no Roblox e preencha o AssetId de cada entrada da tabela music; veja [as instruções de áudio](music/README.md). A troca de música acompanha a aura equipada. A correção de restauração da interface permanece incluída.
+
+## Interface compartilhada para celular e computador
+
+Instalação única: pare o teste; crie um ModuleScript RNGUIConfig em ReplicatedStorage e copie RNGUIConfig.lua inteiro, incluindo return Config. Depois substitua os oito LocalScripts em StarterPlayer → StarterPlayerScripts: RNGClient, RNGInventory, RNGCollection, RNGRankingClient, RNGQuestClient, RNGShopClient, RNGStatusClient e RNGSettingsClient. Não remova os módulos ou scripts do servidor. Se já personalizou os IDs de áudio em RNGSettingsClient, preserve esses valores ao atualizar.
+
+Alternativamente, mantendo suas personalizações, adicione somente o bloco final de registro UIConfig de cada arquivo publicado ao final do LocalScript correspondente; nesta atualização, esses oito arquivos só recebem esse bloco. Não adicione o mesmo registro duas vezes.
+
+RNGUIConfig define CompactWidth (900), CompactHeight (520), Margin, ButtonHeight, MinTextSize, Font, PanelColor, ButtonColor, PanelSizes, RollMaxWidth, CardMaxWidth, RollHeight e margens inferiores de roll. Modifique esses valores para mudar o estilo ou tamanho compartilhado. PanelSizes contém limites de cada painel; não depende de aumentar os antigos UISizeConstraints manualmente. Config.Refresh reaplica as regras se mudar a tabela em execução.
+
+O layout compacto é usado quando a largura é menor que 900, a altura menor que 520 ou o dispositivo tem toque sem teclado. Agrupa os seis atalhos em MENU; as opções continuam na engrenagem. MENU fecha os outros painéis ao abrir, e cada painel fecha os demais. No desktop os atalhos voltam às posições laterais originais. A rolagem e as ações do inventário, missões e loja continuam nos mesmos scripts.
+
+Os painéis respeitam o espaço disponível com margem e limite de tamanho. Fontes usam TextScaled com limites de tamanho para encaixar o texto. Os controles de roll são centralizados e elevados no celular; no modo paisagem sua largura fica limitada para reservar espaço lateral aos controles de movimento. Mudanças na câmera, na orientação e no tamanho da janela reaplicam o layout.
+
+Ocultar interface nas opções também oculta MENU; a engrenagem permanece. Auto Roll continua se já estiver ligado. Os menus não alteram equipamento, sorte, poções, moedas, ranking nem DataStores.
+
+Teste no Emulador de Dispositivos do Studio: celular retrato/paisagem, tablet, janela pequena e computador. Verifique MENU, fechar painel, abrir apenas um menu por vez, rolagem, botões de resgate/compra, movimento/pulo e desligar/religar interface. Os 20 testes simulados verificam dimensões, safe area, reparent dos atalhos, restauração no desktop, ajuste de texto e painel exclusivo. Eles não substituem a verificação visual e de toque no Roblox.

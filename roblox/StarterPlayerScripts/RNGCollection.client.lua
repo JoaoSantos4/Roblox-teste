@@ -166,3 +166,7 @@ toggle.Activated:Connect(function()
 end)
 player:GetAttributeChangedSignal("RNGReady"):Connect(sync)
 sync()
+
+-- Regras compartilhadas para computador e celular.
+local UIConfig = require(ReplicatedStorage:WaitForChild("RNGUIConfig"))
+UIConfig.RegisterPanel("collection", gui, panel, toggle, close, 540, 540, 2)

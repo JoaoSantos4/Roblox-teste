@@ -6,6 +6,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { LuauState } = await import(pathToFileURL(path.resolve(process.argv[2])).href);
 const state = await LuauState.createAsync({ print: (...args) => console.log(...args) });
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+// Harnesses específicos continuam isolados; o módulo real é exercitado em ui.spec.luau.
+const readClient = file => read(file).replace('require(ReplicatedStorage:WaitForChild("RNGUIConfig"))', '{ RegisterPanel = function() end, RegisterRoll = function() end }');
 const files = [
     'roblox/ServerScriptService/RNGConfig.lua',
     'roblox/ServerScriptService/RNGProfile.lua',
@@ -22,6 +24,7 @@ const files = [
     'roblox/StarterPlayerScripts/RNGRankingClient.client.lua',
     'roblox/StarterPlayerScripts/RNGStatusClient.client.lua',
     'roblox/StarterPlayerScripts/RNGSettingsClient.client.lua',
+    'roblox/ReplicatedStorage/RNGUIConfig.lua',
 ];
 try {
     for (const file of files) {
@@ -29,16 +32,17 @@ try {
         console.log('Compilação Luau OK:', file);
     }
     const profile = read(files[1]);
-    for (const file of ['tests/profile.spec.luau', 'tests/server.spec.luau', 'tests/effects.spec.luau', 'tests/client.spec.luau', 'tests/daily.spec.luau', 'tests/quests.spec.luau', 'tests/collection.spec.luau', 'tests/rankings.spec.luau', 'tests/status.spec.luau', 'tests/settings.spec.luau']) {
+    for (const file of ['tests/profile.spec.luau', 'tests/server.spec.luau', 'tests/effects.spec.luau', 'tests/client.spec.luau', 'tests/daily.spec.luau', 'tests/quests.spec.luau', 'tests/collection.spec.luau', 'tests/rankings.spec.luau', 'tests/status.spec.luau', 'tests/settings.spec.luau', 'tests/ui.spec.luau']) {
         const source = read(file)
             .replace('require("../roblox/ServerScriptService/RNGProfile")', `(function()\n${profile}\nend)()`)
             .replace('require("../roblox/ServerScriptService/RNGDaily")', `(function()\n${read('roblox/ServerScriptService/RNGDaily.lua')}\nend)()`)
             .replace('require("../roblox/ServerScriptService/RNGAuraEffect")', `(function()\n${read('roblox/ServerScriptService/RNGAuraEffect.lua')}\nend)()`)
-            .replace('-- CLIENT_SOURCE', read('roblox/StarterPlayerScripts/RNGClient.client.lua'))
-            .replace('-- SETTINGS_SOURCE', read('roblox/StarterPlayerScripts/RNGSettingsClient.client.lua'))
-            .replace('-- STATUS_SOURCE', read('roblox/StarterPlayerScripts/RNGStatusClient.client.lua'))
+            .replace('-- UI_SOURCE', read('roblox/ReplicatedStorage/RNGUIConfig.lua'))
+            .replace('-- CLIENT_SOURCE', readClient('roblox/StarterPlayerScripts/RNGClient.client.lua'))
+            .replace('-- SETTINGS_SOURCE', readClient('roblox/StarterPlayerScripts/RNGSettingsClient.client.lua'))
+            .replace('-- STATUS_SOURCE', readClient('roblox/StarterPlayerScripts/RNGStatusClient.client.lua'))
             .replace('-- RANKINGS_SOURCE', read('roblox/ServerScriptService/RNGRankings.lua'))
-            .replace('-- COLLECTION_SOURCE', read('roblox/StarterPlayerScripts/RNGCollection.client.lua'))
+            .replace('-- COLLECTION_SOURCE', readClient('roblox/StarterPlayerScripts/RNGCollection.client.lua'))
             .replace('-- QUEST_SOURCE', read('roblox/ServerScriptService/RNGQuests.lua'))
             .replace('-- SERVER_SOURCE', read('roblox/ServerScriptService/RNGServer.server.lua'));
         await state.loadstring(source, file, true)();

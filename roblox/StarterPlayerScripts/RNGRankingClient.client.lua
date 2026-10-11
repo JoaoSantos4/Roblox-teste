@@ -163,3 +163,7 @@ event.OnClientEvent:Connect(function(snapshot)
 	render()
 end)
 request()
+
+-- Regras compartilhadas para computador e celular.
+local UIConfig = require(ReplicatedStorage:WaitForChild("RNGUIConfig"))
+UIConfig.RegisterPanel("ranking", gui, panel, toggle, close, 620, 540, 3)
