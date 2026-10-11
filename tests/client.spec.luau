@@ -38,7 +38,7 @@ local Enum = { Font = { GothamBold = "Bold" }, EasingStyle = { Back = "Back" } }
 local TweenInfo = { new = function(...) return {...} end }
 local Random = { new = function() return { NextInteger = function() return 1 end } end }
 local player = { ready = true, changed = signal() }
-function player:GetAttribute() return self.ready end
+function player:GetAttribute(key) if key == "RNGRollAudio" then return self.rollAudio end; return self.ready end
 function player:GetAttributeChangedSignal() return self.changed end
 function player:WaitForChild() return {} end
 local roll = { OnClientEvent = signal(), requests = {} }
@@ -60,11 +60,12 @@ end
 local remotes = { WaitForChild = function(_, name)
     return name == "Roll" and roll or { OnClientEvent = signal() }
 end }
+local soundPlays = 0
 local services = {
     Players = { LocalPlayer = player },
     ReplicatedStorage = { WaitForChild = function() return remotes end },
     TweenService = { Create = function() return { Play = function() end, Cancel = function() end } end },
-    TextChatService = {}, SoundService = { PlayLocalSound = function() end },
+    TextChatService = {}, SoundService = { PlayLocalSound = function() soundPlays += 1 end },
 }
 local game = { GetService = function(_, name) return services[name] end }
 
@@ -129,4 +130,13 @@ advance(23)
 check(manual.Text == "Aguarde...")
 advance(24.5)
 check(manual.Text == "ROLL")
+player.rollAudio = false
+local beforeAudio = soundPlays
+click(manual)
+advance(28)
+check(soundPlays == beforeAudio and manual.Text == "ROLL")
+player.rollAudio = true
+click(manual)
+advance(32)
+check(soundPlays > beforeAudio and manual.Text == "ROLL")
 print("Client: " .. count .. " verificações passaram (relógio e serviços simulados)")

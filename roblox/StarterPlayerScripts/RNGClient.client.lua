@@ -24,10 +24,12 @@ gui.ResetOnSpawn = false
 -- O inventário fica acima desta interface.
 gui.Parent = player:WaitForChild("PlayerGui")
 local sound = Instance.new("Sound")
+sound.Name = "RNGRollSound"
 sound.SoundId = SOUND_ID
 sound.Parent = gui
 local function playSound(volume, speed)
     sound:Stop()
+    if player:GetAttribute("RNGRollAudio") == false then return end
     sound.Volume, sound.PlaybackSpeed = volume, speed
     sound.TimePosition = 0
     SoundService:PlayLocalSound(sound)

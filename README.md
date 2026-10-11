@@ -29,6 +29,7 @@ Pare o teste antes de editar. Abra cada arquivo pelo link abaixo e clique em **R
 | RNGCollection | LocalScript | [RNGCollection.client.lua](roblox/StarterPlayerScripts/RNGCollection.client.lua) |
 | RNGRankingClient | LocalScript | [RNGRankingClient.client.lua](roblox/StarterPlayerScripts/RNGRankingClient.client.lua) |
 | RNGStatusClient | LocalScript | [RNGStatusClient.client.lua](roblox/StarterPlayerScripts/RNGStatusClient.client.lua) |
+| RNGSettingsClient | LocalScript | [RNGSettingsClient.client.lua](roblox/StarterPlayerScripts/RNGSettingsClient.client.lua) |
 
 A interface e os RemoteEvents são criados automaticamente. RNGAuraEffect é singular. Para atualizar a loja na instalação existente, substitua RNGDaily, RNGQuests e RNGServer juntos e adicione RNGShopClient.
 
@@ -75,7 +76,7 @@ npm install --prefix /tmp/rng-luau-check --cache /tmp/rng-npm-cache --ignore-scr
 node tests/check.mjs /tmp/rng-luau-check/node_modules/luau-web/src/index.js
 ```
 
-Os quatorze scripts compilam em Luau. Testes com serviços simulados: 22 do perfil, 34 do servidor, 17 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, 13 de status, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
+Os quinze scripts compilam em Luau. Testes com serviços simulados: 22 do perfil, 34 do servidor, 19 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, 13 de status, 18 das opções, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
 
 ## Coleção de auras
 
@@ -108,3 +109,17 @@ O botão STATUS aparece à direita, abaixo de LOJA. Mostra tempo total online e 
 PlaySeconds é contado pelo relógio do servidor e salvo junto do perfil em RNG_Best_v1, no autosave, na saída e no encerramento. Começa em zero para dados antigos. Tempo das missões não é convertido porque reiniciava e tinha limites. Conta permanência online incluindo AFK e respawn; não conta tempo fora do jogo. Tempo e rolls da sessão reiniciam ao entrar novamente. Frações menores que um segundo podem ser descartadas ao sair. Interrupções abruptas podem perder tempo ainda não salvo. A fusão por máximo tem a mesma limitação de sessões simultâneas já descrita para rolls.
 
 Teste abrir STATUS, rolar algumas vezes, equipar uma aura, comprar uma melhoria e conferir os valores. Aguarde um minuto, saia e entre novamente: tempo e rolls totais permanecem; sessão reinicia. Falha no serviço das missões mostra economia indisponível sem inventar saldo. Testes simulados verificam o tempo no servidor, persistência, limitação dos pedidos e renderização dos valores; confira a interface no Studio.
+
+## Engrenagem e opções
+
+Pare o teste. Substitua RNGClient inteiro e crie um LocalScript RNGSettingsClient em StarterPlayer → StarterPlayerScripts com o arquivo completo. Os módulos do servidor permanecem instalados. A engrenagem usa GuiService.TopbarInset para acompanhar a área livre ao lado dos controles do Roblox, inclusive voz, sem editar CoreGui. Sua posição final depende da versão do cliente, do dispositivo e dos controles disponíveis.
+
+Há sete opções independentes: mostrar sua aura; mostrar auras dos outros; mostrar interface RNG; áudio do Roblox (passos e efeitos padrão dos personagens); música ambiente; música da aura equipada; sons dos rolls. São preferências locais durante a sessão e sobrevivem a respawn, mas voltam ao padrão ao entrar novamente. Não alteram equipamento, resultados, salvamento, microfone ou chat de voz. Ocultar interface afeta apenas ScreenGuis do jogo com nome RNG; a engrenagem e a interface padrão do Roblox continuam acessíveis. Auto Roll já ligado continua funcionando com a interface escondida.
+
+Visibilidade de aura é local: desliga Beams, Trails, emissores, luzes e título marcados pelo sistema, preservando o estado anterior. Emissores são limpos ao esconder. Aplica a personagens presentes, novos jogadores, respawn e novos efeitos. Não torna o corpo ou objetos externos invisíveis.
+
+A trilha ambiente e as sete melodias de aura são sequências próprias de notas tocadas com electronicpingshort.wav, incluído no Roblox. Cada aura tem sequência e ritmo próprios, incluindo Segredo. Música de aura segue a sua aura equipada confirmada pelo servidor; não toca as músicas de todos os personagens ao mesmo tempo. As duas categorias podem tocar juntas e têm volume baixo. Não são gravações de músicas comerciais. É possível substituir cada sequência por uma faixa autorizada: na tabela music de RNGSettingsClient, preencha AssetId com rbxassetid://ID. Com AssetId vazio, usa as notas incluídas; com ID, usa faixa em loop. O áudio precisa estar autorizado para a experiência.
+
+O switch de áudio Roblox controla os sons padrão dos personagens visíveis (passos, salto, queda, morte e água), usando SoundGroup local. Não controla sons privados da interface Roblox, voz ou volume do sistema. RollAudio é respeitado antes de cada som pelo RNGClient atualizado.
+
+Teste no Studio e no cliente Roblox: posição da engrenagem com/sem voz, mouse/toque, ocultar interface e reabrir opções, esconder/restaurar sua aura e a dos outros, respawn, troca de aura, tirar aura, desligar cada categoria de áudio e religa-la. Qualidade musical, posicionamento real e multiplayer exigem testes no Roblox. Compilação e testes de opções, restauração e áudio foram executados com serviços simulados.
