@@ -20,6 +20,7 @@ const files = [
     'roblox/StarterPlayerScripts/RNGCollection.client.lua',
     'roblox/ServerScriptService/RNGRankings.lua',
     'roblox/StarterPlayerScripts/RNGRankingClient.client.lua',
+    'roblox/StarterPlayerScripts/RNGStatusClient.client.lua',
 ];
 try {
     for (const file of files) {
@@ -27,12 +28,13 @@ try {
         console.log('Compilação Luau OK:', file);
     }
     const profile = read(files[1]);
-    for (const file of ['tests/profile.spec.luau', 'tests/server.spec.luau', 'tests/effects.spec.luau', 'tests/client.spec.luau', 'tests/daily.spec.luau', 'tests/quests.spec.luau', 'tests/collection.spec.luau', 'tests/rankings.spec.luau']) {
+    for (const file of ['tests/profile.spec.luau', 'tests/server.spec.luau', 'tests/effects.spec.luau', 'tests/client.spec.luau', 'tests/daily.spec.luau', 'tests/quests.spec.luau', 'tests/collection.spec.luau', 'tests/rankings.spec.luau', 'tests/status.spec.luau']) {
         const source = read(file)
             .replace('require("../roblox/ServerScriptService/RNGProfile")', `(function()\n${profile}\nend)()`)
             .replace('require("../roblox/ServerScriptService/RNGDaily")', `(function()\n${read('roblox/ServerScriptService/RNGDaily.lua')}\nend)()`)
             .replace('require("../roblox/ServerScriptService/RNGAuraEffect")', `(function()\n${read('roblox/ServerScriptService/RNGAuraEffect.lua')}\nend)()`)
             .replace('-- CLIENT_SOURCE', read('roblox/StarterPlayerScripts/RNGClient.client.lua'))
+            .replace('-- STATUS_SOURCE', read('roblox/StarterPlayerScripts/RNGStatusClient.client.lua'))
             .replace('-- RANKINGS_SOURCE', read('roblox/ServerScriptService/RNGRankings.lua'))
             .replace('-- COLLECTION_SOURCE', read('roblox/StarterPlayerScripts/RNGCollection.client.lua'))
             .replace('-- QUEST_SOURCE', read('roblox/ServerScriptService/RNGQuests.lua'))

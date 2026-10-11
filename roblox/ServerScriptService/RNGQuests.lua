@@ -75,15 +75,12 @@ local function send(player, state, message)
 			end
 			table.insert(products, product)
 		end
-		shopEvent:FireClient(
-			player,
-			{
-				Coins = state.data.Coins,
-				Shop = table.clone(state.data.Shop),
-				Products = products,
-				Message = message,
-			}
-		)
+		shopEvent:FireClient(player, {
+			Coins = state.data.Coins,
+			Shop = table.clone(state.data.Shop),
+			Products = products,
+			Message = message,
+		})
 	end
 	player:SetAttribute("RNGCoins", state.data.Coins)
 	event:FireClient(player, {
@@ -217,6 +214,19 @@ function Quests.RecordRoll(player, item)
 end
 function Quests.RecordEquip(player, id)
 	record(player, "equip", id)
+end
+function Quests.Status(player)
+	local state = states[player]
+	if not state or not state.loaded or state.failed then
+		return { Ready = false }
+	end
+	return {
+		Ready = true,
+		Coins = state.data.Coins,
+		Level = state.data.Shop.Level,
+		LuckUntil = state.data.Shop.LuckUntil,
+		SpeedUntil = state.data.Shop.SpeedUntil,
+	}
 end
 function Quests.Bonuses(player)
 	local state = states[player]

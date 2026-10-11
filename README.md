@@ -28,6 +28,7 @@ Pare o teste antes de editar. Abra cada arquivo pelo link abaixo e clique em **R
 | RNGShopClient | LocalScript | [RNGShopClient.client.lua](roblox/StarterPlayerScripts/RNGShopClient.client.lua) |
 | RNGCollection | LocalScript | [RNGCollection.client.lua](roblox/StarterPlayerScripts/RNGCollection.client.lua) |
 | RNGRankingClient | LocalScript | [RNGRankingClient.client.lua](roblox/StarterPlayerScripts/RNGRankingClient.client.lua) |
+| RNGStatusClient | LocalScript | [RNGStatusClient.client.lua](roblox/StarterPlayerScripts/RNGStatusClient.client.lua) |
 
 A interface e os RemoteEvents são criados automaticamente. RNGAuraEffect é singular. Para atualizar a loja na instalação existente, substitua RNGDaily, RNGQuests e RNGServer juntos e adicione RNGShopClient.
 
@@ -74,7 +75,7 @@ npm install --prefix /tmp/rng-luau-check --cache /tmp/rng-npm-cache --ignore-scr
 node tests/check.mjs /tmp/rng-luau-check/node_modules/luau-web/src/index.js
 ```
 
-Os treze scripts compilam em Luau. Testes com serviços simulados: 18 do perfil, 29 do servidor, 17 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
+Os quatorze scripts compilam em Luau. Testes com serviços simulados: 22 do perfil, 34 do servidor, 17 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, 28 do ranking, 13 de status, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
 
 ## Coleção de auras
 
@@ -97,3 +98,13 @@ TotalRolls é salvo junto do perfil RNG_Best_v1 e começa em zero para perfis an
 Os OrderedDataStores RNG_GlobalBest_v1 e RNG_GlobalRolls_v1 recebem somente valores de perfis confirmados no DataStore normal. A fila de publicação e a leitura do Top 20 rodam a cada 60 segundos, em cada servidor. Dados costumam aparecer em 1–2 minutos; limites, falhas e consistência eventual podem aumentar esse atraso. Pedidos dos clientes só leem um cache e nunca informam scores nem disparam consultas ao DataStore. Falhas de gravação mantêm a fila para tentar novamente; se o servidor fechar, o perfil salvo republica ao voltar.
 
 Teste em uma experiência publicada com acesso à API: faça rolls, aguarde as atualizações e veja as duas abas. Saia e entre para conferir que o total permanece. Os rankings são da mesma experiência Roblox em todos os seus servidores; uma experiência de teste separada tem outros DataStores. Falhas de leitura preservam o último ranking válido e são registradas na Saída. A verificação real entre servidores ainda exige Roblox Studio/Roblox.
+
+## Status do jogador
+
+Pare o teste. Substitua todo o conteúdo de RNGProfile, RNGQuests e RNGServer pelas versões atuais. Crie o LocalScript RNGStatusClient em StarterPlayer → StarterPlayerScripts. Mantenha todos os outros módulos, incluindo RNGRankings.
+
+O botão STATUS aparece à direita, abaixo de LOJA. Mostra tempo total online e da sessão atual; rolls totais e da sessão; melhor aura e chance base; aura equipada; descobertas no catálogo; moedas; nível da melhoria; e duração restante das poções. Atualiza a cada cinco segundos somente quando o painel está aberto. O servidor limita pedidos e ignora valores extras fornecidos pelo cliente. Não consulta DataStore para cada atualização do painel.
+
+PlaySeconds é contado pelo relógio do servidor e salvo junto do perfil em RNG_Best_v1, no autosave, na saída e no encerramento. Começa em zero para dados antigos. Tempo das missões não é convertido porque reiniciava e tinha limites. Conta permanência online incluindo AFK e respawn; não conta tempo fora do jogo. Tempo e rolls da sessão reiniciam ao entrar novamente. Frações menores que um segundo podem ser descartadas ao sair. Interrupções abruptas podem perder tempo ainda não salvo. A fusão por máximo tem a mesma limitação de sessões simultâneas já descrita para rolls.
+
+Teste abrir STATUS, rolar algumas vezes, equipar uma aura, comprar uma melhoria e conferir os valores. Aguarde um minuto, saia e entre novamente: tempo e rolls totais permanecem; sessão reinicia. Falha no serviço das missões mostra economia indisponível sem inventar saldo. Testes simulados verificam o tempo no servidor, persistência, limitação dos pedidos e renderização dos valores; confira a interface no Studio.

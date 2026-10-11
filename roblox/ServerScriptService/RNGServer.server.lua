@@ -75,6 +75,7 @@ local rollEvent = remote("Roll")
 local announcement = remote("Announcement")
 local inventoryEvent = remote("Inventory")
 local equipEvent = remote("Equip")
+local statusEvent = remote("Status")
 
 folder.Parent = ReplicatedStorage
 
@@ -186,6 +187,17 @@ local function changed(state)
 	state.dirty = true
 end
 
+local function updatePlayTime(state)
+ if not state.loaded then return end
+ local now = state.stoppedAt or os.clock()
+ local seconds = math.max(0, math.floor(now - state.lastPlayTick))
+ if seconds > 0 then
+  state.lastPlayTick += seconds
+  state.data.PlaySeconds += seconds
+  changed(state)
+ end
+end
+
 local function save(player, state)
 	if not state.loaded then
 		return
@@ -195,6 +207,7 @@ local function save(player, state)
 		task.wait(0.1)
 	end
 
+	updatePlayTime(state)
 	if not state.dirty then
 		return
 	end
@@ -244,6 +257,10 @@ local function setupPlayer(player)
 		nextRoll = 0,
 		nextEquip = 0,
 		nextInventory = 0,
+		nextStatus = 0,
+		joinedAt = os.clock(),
+		lastPlayTick = os.clock(),
+		sessionRolls = 0,
 	}
 
 	states[player] = state
@@ -366,6 +383,7 @@ rollEvent.OnServerEvent:Connect(function(player, fast, requestId)
 	-- Um único sorteio: missões e inventário recebem o mesmo resultado.
 	local item = draw(luck)
 	state.data.TotalRolls += 1
+	state.sessionRolls += 1
 	changed(state)
 	Quests.RecordRoll(player, item)
 
@@ -402,6 +420,33 @@ rollEvent.OnServerEvent:Connect(function(player, fast, requestId)
 				.. " — 1 em " .. item.Odds .. "!"
 		)
 	end
+end)
+
+statusEvent.OnServerEvent:Connect(function(player)
+ local state = states[player]
+ if not active(player, state) then
+  if player.Parent == Players and state and not state.leaving then
+   if os.clock() >= (state.nextStatus or 0) then
+    state.nextStatus = os.clock() + 2
+    statusEvent:FireClient(player, { Ready = false })
+   end
+  end
+  return
+ end
+ if os.clock() < state.nextStatus then return end
+ state.nextStatus = os.clock() + 2
+ updatePlayTime(state)
+ local discovered = 0
+ for id in pairs(itemsById) do if state.data.Owned[id] then discovered += 1 end end
+ local best = itemsById[state.data.BestId]
+ local equipped = itemsById[state.data.Equipped]
+ statusEvent:FireClient(player, {
+  Ready = true, TotalRolls = state.data.TotalRolls, SessionRolls = state.sessionRolls,
+  PlaySeconds = state.data.PlaySeconds, SessionSeconds = math.max(0, math.floor(os.clock() - state.joinedAt)),
+  BestName = best and best.Name or (state.data.BestOdds > 0 and "Aura antiga" or "Nenhuma"),
+  BestOdds = state.data.BestOdds, Equipped = equipped and equipped.Name or "Nenhuma",
+  Discovered = discovered, CatalogTotal = #catalog, Economy = Quests.Status(player),
+ })
 end)
 
 inventoryEvent.OnServerEvent:Connect(function(player)
@@ -464,6 +509,7 @@ Players.PlayerRemoving:Connect(function(player)
 		return
 	end
 
+	state.stoppedAt = os.clock()
 	state.leaving = true
 	player:SetAttribute("RNGReady", false)
 	state.characterConnection:Disconnect()
@@ -495,6 +541,7 @@ game:BindToClose(function()
 	local pending = 0
 
 	for player, state in pairs(states) do
+		state.stoppedAt = state.stoppedAt or os.clock()
 		pending += 1
 
 		task.spawn(function()

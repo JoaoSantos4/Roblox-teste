@@ -52,6 +52,7 @@ local require = function(name)
     if name == "RNGQuests" then return {
         Start = function() end,
         Bonuses = function() return 1, 1 end,
+        Status = function() return { Ready = true, Coins = 123, Level = 0, LuckUntil = 0, SpeedUntil = 0 } end,
         RecordRoll = function(_, item) questRolls += 1; lastQuestAura = item and item.Id end,
         RecordEquip = function() questEquips += 1 end,
     } end
@@ -122,7 +123,20 @@ check(inventory.last.Equipped == nil)
 Players.PlayerRemoving.fn(p)
 check(saved.Version == 2 and saved.Owned.common and saved.Owned.rare)
 check(saved.BestOdds == 50 and saved.Equipped == nil and saved.EquipTime > 0)
+check(saved.PlaySeconds == 4)
 check(saved.TotalRolls == 3) -- pedidos falsos e cooldown não contam
+local resumed = player(1)
+Players.PlayerAdded.fn(resumed)
+local status = event("Status")
+now = 10
+status.OnServerEvent.fn(resumed)
+check(status.last.Ready and status.last.SessionSeconds == 6 and status.last.PlaySeconds == 10)
+check(status.last.Economy.Coins == 123)
+check(status.last.TotalRolls == 3 and status.last.SessionRolls == 0)
+local firstStatus = status.last
+status.OnServerEvent.fn(resumed)
+check(status.last == firstStatus)
+Players.PlayerRemoving.fn(resumed)
 local previousWrites = writes
 failLoad = true
 local broken = player(2)
