@@ -46,6 +46,7 @@ for _, item in ipairs(Config.Items) do
 		Name = item.Name,
 		Odds = item.Odds,
 		Color = item.Color,
+		Secret = item.Secret == true,
 	})
 end
 

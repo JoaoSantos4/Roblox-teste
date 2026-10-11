@@ -25,12 +25,13 @@ Pare o teste antes de editar. Abra cada arquivo pelo link abaixo e clique em **R
 | RNGInventory | LocalScript | [RNGInventory.client.lua](roblox/StarterPlayerScripts/RNGInventory.client.lua) |
 | RNGQuestClient | LocalScript | [RNGQuestClient.client.lua](roblox/StarterPlayerScripts/RNGQuestClient.client.lua) |
 | RNGShopClient | LocalScript | [RNGShopClient.client.lua](roblox/StarterPlayerScripts/RNGShopClient.client.lua) |
+| RNGCollection | LocalScript | [RNGCollection.client.lua](roblox/StarterPlayerScripts/RNGCollection.client.lua) |
 
 A interface e os RemoteEvents são criados automaticamente. RNGAuraEffect é singular. Para atualizar a loja na instalação existente, substitua RNGDaily, RNGQuests e RNGServer juntos e adicione RNGShopClient.
 
 ## Funcionalidades
 
-- Seis raridades configuráveis, de Comum (1 em 2) a Divino (1 em 50.000). Sem poções, as probabilidades somam 72,222%; o restante é Sem aura.
+- Sete raridades configuráveis, de Comum (1 em 2) a Segredo (1 em 1.000.000). Sem poções, as probabilidades somam 72,2221%; o restante é Sem aura.
 - Recorde, inventário de auras únicas e equipamento persistidos no servidor.
 - Efeitos de aura, título sobre o personagem e anúncios de Lendário/Divino.
 - Animação e som de rolagem, Auto Roll e modo rápido.
@@ -71,4 +72,14 @@ npm install --prefix /tmp/rng-luau-check --cache /tmp/rng-npm-cache --ignore-scr
 node tests/check.mjs /tmp/rng-luau-check/node_modules/luau-web/src/index.js
 ```
 
-Os dez scripts compilam em Luau. Testes com serviços simulados: 13 do perfil, 27 do servidor, 17 do cliente, 39 das regras de missões/loja e 33 do serviço, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
+Os onze scripts compilam em Luau. Testes com serviços simulados: 13 do perfil, 28 do servidor, 17 do cliente, 39 das regras de missões/loja e 33 do serviço, 12 da coleção, além de criação e limpeza das auras. Renderização, som, replicação e DataStore real exigem Roblox Studio.
+
+## Coleção de auras
+
+Para instalar a coleção, substitua o conteúdo de RNGConfig e RNGServer pelas versões completas atuais. Em StarterPlayer → StarterPlayerScripts, crie um LocalScript chamado RNGCollection e cole RNGCollection.client.lua inteiro. Mantenha o inventário e os outros scripts.
+
+COLEÇÃO aparece à esquerda, abaixo de INVENTÁRIO. Mostra as descobertas, chances base, bloqueadas, aura equipada, contagem e barra de progresso. Recebe o mesmo catálogo e inventário do servidor, sem gravar dados novos ou conceder auras. Auras já salvas aparecem descobertas; o item Sem aura não faz parte da coleção.
+
+A nova aura secret (Segredo) tem chance base de 1 em 1.000.000, cor rosa/vermelha e anúncio no chat. Aparece como ??? até ser obtida, com a chance visível. Secret é uma ocultação visual do nome no catálogo; não oculta o código da raridade de clientes modificados. Se obtida, entra no inventário normalmente e usa os efeitos genéricos existentes na sua cor. Nenhuma aura é concedida automaticamente por esta atualização.
+
+Teste coleção antes e depois de uma descoberta, troca de equipamento, respawn e nova entrada. Confira os botões no celular. A compilação e 12 verificações da coleção passaram com interface simulada; a renderização exige Studio.

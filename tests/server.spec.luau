@@ -3,6 +3,7 @@ local Profile = require("../roblox/ServerScriptService/RNGProfile")
 local Config = { Cooldown = 1.5, FastCooldown = 0.6, AutosaveSeconds = 60, Items = {
     { Id = "common", Name = "Comum", Odds = 2, Color = "white" },
     { Id = "rare", Name = "Raro", Odds = 50, Color = "blue" },
+    { Id = "secret", Name = "Segredo", Odds = 1000000, Color = "red", Secret = true },
 } }
 local now = 0
 local os = { clock = function() return now end }
@@ -129,4 +130,6 @@ roll.OnServerEvent.fn(broken)
 check(roll.results == rolls)
 Players.PlayerRemoving.fn(broken)
 check(writes == previousWrites)
+check(inventory.last.Catalog[3].Secret == true and inventory.last.Owned.secret == nil)
 print("Server: " .. count .. " verificações passaram (serviços simulados)")
+
